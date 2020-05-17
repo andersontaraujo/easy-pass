@@ -11,8 +11,8 @@ public class RestExceptionHandler {
 
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(PasswordNotFoundException.class)
-    public ExceptionResponseDTO handlePasswordNotFoundException(PasswordNotFoundException e) {
+    @ExceptionHandler(value = {PasswordNotFoundException.class})
+    public ExceptionResponseDTO handleResourcesNotFoundException(Exception e) {
         return ExceptionResponseDTO.builder()
                 .statusCode(HttpStatus.NOT_FOUND.value())
                 .error(HttpStatus.NOT_FOUND.getReasonPhrase())
