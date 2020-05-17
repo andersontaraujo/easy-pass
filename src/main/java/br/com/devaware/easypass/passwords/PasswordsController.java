@@ -1,5 +1,6 @@
 package br.com.devaware.easypass.passwords;
 
+import br.com.devaware.easypass.exceptions.PasswordNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,7 +36,7 @@ public class PasswordsController {
     public ResponseEntity<?> findPasswordById(@PathVariable String id) {
         return repository.findById(id)
                 .map(ResponseEntity::ok)
-                .orElseThrow(() -> new RuntimeException(String.format("Password with id [%s] not found.", id)));
+                .orElseThrow(() -> new PasswordNotFoundException(String.format("Password with id [%s] not found.", id)));
     }
 
     @DeleteMapping
@@ -46,7 +47,7 @@ public class PasswordsController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> removePasswordById(@PathVariable String id) {
-        repository.delete(repository.findById(id).orElseThrow(() -> new RuntimeException(String.format("Password with id [%s] not found.", id))));
+        repository.delete(repository.findById(id).orElseThrow(() -> new PasswordNotFoundException(String.format("Password with id [%s] was not found.", id))));
         return ResponseEntity.noContent().build();
     }
 }
