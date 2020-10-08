@@ -1,16 +1,21 @@
 package br.com.devaware.easypass.passwords;
 
 import br.com.devaware.easypass.exceptions.PasswordNotFoundException;
+import br.com.devaware.easypass.passwords.dtos.CreatePasswordRequestDTO;
+import br.com.devaware.easypass.passwords.dtos.UpdatePasswordRequestDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @RestController
@@ -21,8 +26,8 @@ public class PasswordsController {
     private PasswordRepository repository;
 
     @PostMapping
-    public ResponseEntity<Password> createPassword(@RequestBody Password password) {
-        Password savedPassword = repository.save(password);
+    public ResponseEntity<Password> createPassword(@Valid @RequestBody CreatePasswordRequestDTO request) {
+        Password savedPassword = repository.save(Password.builder().value(request.getValue()).build());
         return ResponseEntity.ok(savedPassword);
     }
 
@@ -36,6 +41,16 @@ public class PasswordsController {
     public ResponseEntity<?> findPasswordById(@PathVariable String id) {
         return repository.findById(id)
                 .map(ResponseEntity::ok)
+                .orElseThrow(() -> new PasswordNotFoundException(id));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Password> updatePassword(@PathVariable String id, @Valid @RequestBody UpdatePasswordRequestDTO request) {
+        return repository.findById(id)
+                .map(p -> {
+                    Password updatedPassword = repository.save(p.toBuilder().value(request.getValue()).build());
+                    return ResponseEntity.ok(updatedPassword);
+                })
                 .orElseThrow(() -> new PasswordNotFoundException(id));
     }
 
