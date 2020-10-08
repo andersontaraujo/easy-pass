@@ -20,6 +20,7 @@ public class Password {
     @Id
     private String id;
     private String value;
+    private PasswordType type;
     @CreatedDate
     private LocalDateTime createdDate;
     @LastModifiedDate

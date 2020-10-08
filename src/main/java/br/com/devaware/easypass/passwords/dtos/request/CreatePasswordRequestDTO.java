@@ -1,4 +1,4 @@
-package br.com.devaware.easypass.passwords.dtos;
+package br.com.devaware.easypass.passwords.dtos.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,9 @@ import javax.validation.constraints.NotBlank;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdatePasswordRequestDTO {
+public class CreatePasswordRequestDTO {
     @NotBlank
     private String value;
+    @NotBlank
+    private String type;
 }
