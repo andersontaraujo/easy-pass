@@ -1,8 +1,7 @@
 package br.com.devaware.easypass.passwords;
 
 import br.com.devaware.easypass.exceptions.ResourceNotFoundException;
-import br.com.devaware.easypass.passwords.dtos.request.CreatePasswordRequestDTO;
-import br.com.devaware.easypass.passwords.dtos.request.UpdatePasswordRequestDTO;
+import br.com.devaware.easypass.passwords.dtos.request.PasswordPartialDTO;
 import br.com.devaware.easypass.passwords.dtos.response.PasswordDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,7 @@ public class PasswordService {
     @Autowired
     private ModelMapper mapper;
 
-    public PasswordDTO createPassword(CreatePasswordRequestDTO request) {
+    public PasswordDTO createPassword(PasswordPartialDTO request) {
         Password savedPassword = repository.save(mapper.map(request, Password.class));
         return mapper.map(savedPassword, PasswordDTO.class);
     }
@@ -40,7 +39,7 @@ public class PasswordService {
                 .orElseThrow(throwException(id));
     }
 
-    public PasswordDTO updatePassword(String id, UpdatePasswordRequestDTO request) {
+    public PasswordDTO updatePassword(String id, PasswordPartialDTO request) {
         return repository.findById(id)
                 .map(handlePasswordUpdating(request))
                 .orElseThrow(throwException(id));
@@ -58,7 +57,7 @@ public class PasswordService {
         return () -> new ResourceNotFoundException(id);
     }
 
-    private Function<Password, PasswordDTO> handlePasswordUpdating(UpdatePasswordRequestDTO request) {
+    private Function<Password, PasswordDTO> handlePasswordUpdating(PasswordPartialDTO request) {
         return password -> {
             Password updatedPassword = repository.save(mergePassword().apply(password, mapper.map(request, Password.class)));
             return mapper.map(updatedPassword, PasswordDTO.class);

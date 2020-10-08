@@ -1,7 +1,6 @@
 package br.com.devaware.easypass.passwords;
 
-import br.com.devaware.easypass.passwords.dtos.request.CreatePasswordRequestDTO;
-import br.com.devaware.easypass.passwords.dtos.request.UpdatePasswordRequestDTO;
+import br.com.devaware.easypass.passwords.dtos.request.PasswordPartialDTO;
 import br.com.devaware.easypass.passwords.dtos.response.PasswordDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +26,7 @@ public class PasswordController {
     private PasswordService service;
 
     @PostMapping
-    public ResponseEntity<PasswordDTO> createPassword(@Valid @RequestBody CreatePasswordRequestDTO request) {
+    public ResponseEntity<PasswordDTO> createPassword(@Valid @RequestBody PasswordPartialDTO request) {
         PasswordDTO password = service.createPassword(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(password.getId()).toUri();
         return ResponseEntity.created(location).body(password);
@@ -46,7 +45,7 @@ public class PasswordController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PasswordDTO> updatePassword(@PathVariable String id, @Valid @RequestBody UpdatePasswordRequestDTO request) {
+    public ResponseEntity<PasswordDTO> updatePassword(@PathVariable String id, @Valid @RequestBody PasswordPartialDTO request) {
         PasswordDTO password = service.updatePassword(id, request);
         return ResponseEntity.ok(password);
     }

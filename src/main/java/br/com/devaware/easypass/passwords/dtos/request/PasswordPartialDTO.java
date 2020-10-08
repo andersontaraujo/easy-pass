@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdatePasswordRequestDTO {
+public class PasswordPartialDTO {
     @NotBlank
     private String value;
     @NotBlank
