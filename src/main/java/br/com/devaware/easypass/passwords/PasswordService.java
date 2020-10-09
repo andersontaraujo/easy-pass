@@ -9,18 +9,21 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.function.BinaryOperator;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Service
 public class PasswordService {
 
-    @Autowired
     private PasswordRepository repository;
 
-    @Autowired
     private ModelMapper mapper;
+
+    @Autowired
+    public PasswordService(PasswordRepository repository, ModelMapper mapper) {
+        this.repository = repository;
+        this.mapper = mapper;
+    }
 
     public PasswordDTO createPassword(PasswordPartialDTO request) {
         Password savedPassword = repository.save(mapper.map(request, Password.class));
@@ -36,13 +39,16 @@ public class PasswordService {
     public PasswordDTO findPasswordById(String id) {
         return repository.findById(id)
                 .map(password -> mapper.map(password, PasswordDTO.class))
-                .orElseThrow(throwException(id));
+                .orElseThrow(processError(id));
     }
 
     public PasswordDTO updatePassword(String id, PasswordPartialDTO request) {
         return repository.findById(id)
-                .map(handlePasswordUpdating(request))
-                .orElseThrow(throwException(id));
+                .map(password -> {
+                    Password updatedPassword = repository.save(mergePassword().apply(password, mapper.map(request, Password.class)));
+                    return mapper.map(updatedPassword, PasswordDTO.class);
+                })
+                .orElseThrow(processError(id));
     }
 
     public void removeAllPasswords() {
@@ -50,18 +56,11 @@ public class PasswordService {
     }
 
     public void removePasswordById(String id) {
-        repository.delete(repository.findById(id).orElseThrow(throwException(id)));
+        repository.delete(repository.findById(id).orElseThrow(processError(id)));
     }
 
-    private Supplier<RuntimeException> throwException(String id) {
+    private Supplier<RuntimeException> processError(String id) {
         return () -> new ResourceNotFoundException(id);
-    }
-
-    private Function<Password, PasswordDTO> handlePasswordUpdating(PasswordPartialDTO request) {
-        return password -> {
-            Password updatedPassword = repository.save(mergePassword().apply(password, mapper.map(request, Password.class)));
-            return mapper.map(updatedPassword, PasswordDTO.class);
-        };
     }
 
     private BinaryOperator<Password> mergePassword() {

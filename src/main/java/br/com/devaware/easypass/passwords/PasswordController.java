@@ -22,8 +22,12 @@ import java.util.List;
 @RequestMapping("/v1/passwords")
 public class PasswordController {
 
-    @Autowired
     private PasswordService service;
+
+    @Autowired
+    public PasswordController(PasswordService service) {
+        this.service = service;
+    }
 
     @PostMapping
     public ResponseEntity<PasswordDTO> createPassword(@Valid @RequestBody PasswordPartialDTO request) {
