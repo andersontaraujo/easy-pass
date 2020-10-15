@@ -1,3 +1,9 @@
 spring:
   application:
     name: easy-pass
+
+kafka:
+  bootstrap:
+    servers: http://localhost:9092
+  topics:
+    firstTopicName: first_topic

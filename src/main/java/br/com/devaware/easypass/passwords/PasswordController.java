@@ -22,47 +22,56 @@ import java.util.List;
 @RequestMapping("/v1/passwords")
 public class PasswordController {
 
-    private PasswordService service;
+    private PasswordService passwordService;
+
+    private PasswordAsyncService passwordAsyncService;
 
     @Autowired
-    public PasswordController(PasswordService service) {
-        this.service = service;
+    public PasswordController(PasswordService passwordService, PasswordAsyncService passwordAsyncService) {
+        this.passwordService = passwordService;
+        this.passwordAsyncService = passwordAsyncService;
     }
 
     @PostMapping
     public ResponseEntity<PasswordDTO> createPassword(@Valid @RequestBody PasswordPartialDTO request) {
-        PasswordDTO password = service.createPassword(request);
+        PasswordDTO password = passwordService.createPassword(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(password.getId()).toUri();
         return ResponseEntity.created(location).body(password);
     }
 
+    @PostMapping("/async")
+    public ResponseEntity<Void> createPasswordAsync(@Valid @RequestBody PasswordPartialDTO request) {
+        passwordAsyncService.createPasswordAsync(request);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping
     public ResponseEntity<?> findAllPasswords() {
-        List<PasswordDTO> passwords = service.findAllPasswords();
+        List<PasswordDTO> passwords = passwordService.findAllPasswords();
         return ResponseEntity.ok(passwords);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<PasswordDTO> findPasswordById(@PathVariable String id) {
-        PasswordDTO password = service.findPasswordById(id);
+        PasswordDTO password = passwordService.findPasswordById(id);
         return ResponseEntity.ok(password);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<PasswordDTO> updatePassword(@PathVariable String id, @Valid @RequestBody PasswordPartialDTO request) {
-        PasswordDTO password = service.updatePassword(id, request);
+        PasswordDTO password = passwordService.updatePassword(id, request);
         return ResponseEntity.ok(password);
     }
 
     @DeleteMapping
     public ResponseEntity<Void> removeAllPasswords() {
-        service.removeAllPasswords();
+        passwordService.removeAllPasswords();
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> removePasswordById(@PathVariable String id) {
-        service.removePasswordById(id);
+        passwordService.removePasswordById(id);
         return ResponseEntity.noContent().build();
     }
 }
